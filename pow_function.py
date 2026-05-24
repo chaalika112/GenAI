@@ -1,10 +1,4 @@
-def power(base,P):
-    return pow(base,P)
+n = int(input("Enter a number:"))
+P = int(input("Enter the power:"))
 
-base = int(input("Enter your base:"))
-P = int(input("Enter your power:"))
-
-result = power(base,P)
-print(result)
-
-
+print(n ** P)
