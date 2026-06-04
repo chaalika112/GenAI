@@ -16,32 +16,34 @@ while True:
             store.display_items()
 
             item_name = input("Enter iten name: ")
+            quantity = int(input("Enter quantity: "))
 
             try:
-                message = cart.add_item(item_name)
+                message = cart.add_item(item_name, quantity)
                 print(message)
 
             except ValueError as e:
                 print(e)
 
         elif choice == 2:
-            print("\nCart Items:")
 
-            result = cart.display_cart()
+            cart.display_cart()
 
-            if result == "Cart is empty":
-                print(result)
-            else:
-                for item in result:
-                    print(item)
+            remove_item = input(
+             "\nEnter item name to remove (or press Enter): "
+            )
+
+            if remove_item != "":
+              cart.remove_item(remove_item)
+              print("Item removed successfully")
 
         elif choice == 3:
-            total = cart.calculate_total()
-            print("Total Cost =", total)
+              total = cart.calculate_total()
+              print("Total Cost =", total)
 
         elif choice == 4:
-            print("Thank You!")
-            break
+              print("Thank You!")
+              break
 
         else:
             print("Invalid Choice")
