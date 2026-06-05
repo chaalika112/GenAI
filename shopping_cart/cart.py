@@ -8,7 +8,7 @@ class Store:
         }
 
     def display_items(self):
-        print("\nAvailabl Items:")
+        print("\nAvailable Items:")
         for item, details in self.items.items():
             print(item, "- Price:", details["price"], "- Stock:", details["stock"])
 
@@ -44,17 +44,19 @@ class Cart:
     def display_cart(self):
 
         if len(self.cart_items) == 0:
-           return "\nCart is empty"
+            return "\nCart is empty"
 
-        print("\nCart Items:")
+        result = []
 
         for item in self.store.items:
 
-           quantity = self.cart_items.count(item)
+            quantity = self.cart_items.count(item)
 
-        if quantity > 0:
-            print(item, "-", quantity)
+            if quantity > 0:
+                result.append(item + " - " + str(quantity))
 
+        return result
+            
     def calculate_total(self):
         total_cost = 0
 
@@ -62,9 +64,20 @@ class Cart:
             total_cost += self.store.items[item]["price"]
 
         return total_cost
-    def remove_item(self, item_name):
+    def remove_item(self, item_name, quantity):
 
-        if item_name in self.cart_items:
-           self.cart_items.remove(item_name)
-           self.store.items[item_name]["stock"] += 1
+        if item_name not in self.cart_items:
+            raise ValueError("Item not found in cart")
+
+        cart_quantity = self.cart_items.count(item_name)
+
+        if quantity > cart_quantity:
+            raise ValueError("You only have " + str(cart_quantity) + " " + item_name + " in cart")
+
+        for i in range(quantity):
+            self.cart_items.remove(item_name)
+
+        self.store.items[item_name]["stock"] += quantity
+
+        return item_name + " removed from cart"
 

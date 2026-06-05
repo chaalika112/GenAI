@@ -27,15 +27,44 @@ while True:
 
         elif choice == 2:
 
-            cart.display_cart()
+            result = cart.display_cart()
 
-            remove_item = input(
-             "\nEnter item name to remove (or press Enter): "
-            )
+            if result == "\nCart is empty":
+               print(result)
 
-            if remove_item != "":
-              cart.remove_item(remove_item)
-              print("Item removed successfully")
+            else:
+               print("\nCart Items:")
+
+               for item in result:
+                   print(item)
+
+               remove_item = input(
+               "\nEnter item name to remove (or press Enter): "
+               )
+
+               if remove_item != "":
+
+                  while True:
+                        try:
+                            remove_quantity = int(input("Enter quantity to remove: "))
+
+                            message = cart.remove_item(remove_item, remove_quantity)
+                            print(message)
+
+                            print("\nUpdated Cart Items:")
+
+                            result = cart.display_cart()
+
+                            if result == "\nCart is empty":
+                               print(result)
+                            else:
+                               for item in result:
+                                   print(item)
+
+                            break
+
+                        except ValueError as e:
+                              print(e)
 
         elif choice == 3:
               total = cart.calculate_total()
