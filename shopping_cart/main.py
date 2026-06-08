@@ -1,7 +1,12 @@
-from cart import Store, Cart
+from cart import Store, Cart, AddItem, DisplayCart, CalculateTotal, RemoveItem
 
 store = Store()
 cart = Cart(store)
+
+add = AddItem()
+display = DisplayCart()
+total_cost = CalculateTotal()
+remove = RemoveItem()
 
 while True:
     print("\n1. Add Item to Cart")
@@ -20,13 +25,13 @@ while True:
             quantity = int(input("Enter quantity: "))
 
             try:
-                message = cart.add_item(item_name, quantity)
+                message = add.add_item(cart, item_name, quantity)
                 print(message)
             except ValueError as e:
                 print(e)
 
         elif choice == 2:
-            result = cart.display_cart()
+            result = display.display_cart(cart)
 
             if result == "\nCart is empty":
                 print(result)
@@ -36,46 +41,47 @@ while True:
                     print(item)
 
         elif choice == 3:
-            total = cart.calculate_total()
+            total = total_cost.calculate_total(cart)
             print("Total Cost =", total)
 
         elif choice == 4:
-            result = cart.display_cart()
+            result = display.display_cart(cart)
 
             if result == "\nCart is empty":
-               print(result)
+                print(result)
             else:
-               print("\nCart Items:")
-               for item in result:
-                   print(item)
+                print("\nCart Items:")
+                for item in result:
+                    print(item)
 
-               while True:
-                   try:
-                      remove_item = input("\nEnter item name to remove: ")
+                while True:
+                    try:
+                        remove_item = input("\nEnter item name to remove: ")
 
-                      if remove_item not in cart.cart_items:
-                         print("Item not found in cart")
-                         continue
+                        if remove_item not in cart.cart_items:
+                            print("Item not found in cart")
+                            continue
 
-                      remove_quantity = int(input("Enter quantity to remove: "))
+                        remove_quantity = int(input("Enter quantity to remove: "))
 
-                      message = cart.remove_item(remove_item, remove_quantity)
-                      print(message)
+                        message = remove.remove_item(cart, remove_item, remove_quantity)
+                        print(message)
 
-                      print("\nUpdated Cart Items:")
+                        print("\nUpdated Cart Items:")
 
-                      result = cart.display_cart()
+                        result = display.display_cart(cart)
 
-                      if result == "\nCart is empty":
-                         print(result)
-                      else:
-                         for item in result:
-                             print(item)
+                        if result == "\nCart is empty":
+                            print(result)
+                        else:
+                            for item in result:
+                                print(item)
 
-                      break
+                        break
 
-                   except ValueError as e:
+                    except ValueError as e:
                         print(e)
+
         elif choice == 5:
             print("Thank You!")
             break

@@ -25,59 +25,63 @@ class Cart:
         self.store = store
         self.cart_items = []
 
-    def add_item(self, item_name, quantity):
 
-        self.store.check_item(item_name)
+class AddItem:
+    def add_item(self, cart, item_name, quantity):
+        cart.store.check_item(item_name)
 
-        stock = self.store.items[item_name]["stock"]
+        stock = cart.store.items[item_name]["stock"]
 
         if quantity > stock:
-           raise ValueError("Only " + str(stock) + " items available")
+            raise ValueError("Only " + str(stock) + " items available")
 
         for i in range(quantity):
-           self.cart_items.append(item_name)
+            cart.cart_items.append(item_name)
 
-        self.store.items[item_name]["stock"] -= quantity
+        cart.store.items[item_name]["stock"] -= quantity
 
         return item_name + " added to cart"
 
-    def display_cart(self):
 
-        if len(self.cart_items) == 0:
+class DisplayCart:
+    def display_cart(self, cart):
+        if len(cart.cart_items) == 0:
             return "\nCart is empty"
 
         result = []
 
-        for item in self.store.items:
-
-            quantity = self.cart_items.count(item)
+        for item in cart.store.items:
+            quantity = cart.cart_items.count(item)
 
             if quantity > 0:
                 result.append(item + " - " + str(quantity))
 
         return result
-            
-    def calculate_total(self):
+
+
+class CalculateTotal:
+    def calculate_total(self, cart):
         total_cost = 0
 
-        for item in self.cart_items:
-            total_cost += self.store.items[item]["price"]
+        for item in cart.cart_items:
+            total_cost += cart.store.items[item]["price"]
 
         return total_cost
-    def remove_item(self, item_name, quantity):
 
-        if item_name not in self.cart_items:
+
+class RemoveItem:
+    def remove_item(self, cart, item_name, quantity):
+        if item_name not in cart.cart_items:
             raise ValueError("Item not found in cart")
 
-        cart_quantity = self.cart_items.count(item_name)
+        cart_quantity = cart.cart_items.count(item_name)
 
         if quantity > cart_quantity:
             raise ValueError("You only have " + str(cart_quantity) + " " + item_name + " in cart")
 
         for i in range(quantity):
-            self.cart_items.remove(item_name)
+            cart.cart_items.remove(item_name)
 
-        self.store.items[item_name]["stock"] += quantity
+        cart.store.items[item_name]["stock"] += quantity
 
         return item_name + " removed from cart"
-
