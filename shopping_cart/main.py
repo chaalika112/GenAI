@@ -43,36 +43,39 @@ while True:
             result = cart.display_cart()
 
             if result == "\nCart is empty":
-                print(result)
+               print(result)
             else:
-                print("\nCart Items:")
-                for item in result:
-                    print(item)
+               print("\nCart Items:")
+               for item in result:
+                   print(item)
 
-                remove_item = input("\nEnter item name to remove: ")
+               while True:
+                   try:
+                      remove_item = input("\nEnter item name to remove: ")
 
-                while True:
-                    try:
-                        remove_quantity = int(input("Enter quantity to remove: "))
+                      if remove_item not in cart.cart_items:
+                         print("Item not found in cart")
+                         continue
 
-                        message = cart.remove_item(remove_item, remove_quantity)
-                        print(message)
+                      remove_quantity = int(input("Enter quantity to remove: "))
 
-                        print("\nUpdated Cart Items:")
+                      message = cart.remove_item(remove_item, remove_quantity)
+                      print(message)
 
-                        result = cart.display_cart()
+                      print("\nUpdated Cart Items:")
 
-                        if result == "\nCart is empty":
-                            print(result)
-                        else:
-                            for item in result:
-                                print(item)
+                      result = cart.display_cart()
 
-                        break
+                      if result == "\nCart is empty":
+                         print(result)
+                      else:
+                         for item in result:
+                             print(item)
 
-                    except ValueError as e:
+                      break
+
+                   except ValueError as e:
                         print(e)
-
         elif choice == 5:
             print("Thank You!")
             break
