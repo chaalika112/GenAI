@@ -39,7 +39,6 @@ class Store:
         )
 
         result = self.cursor.fetchone()
-
         return result[0]
 
     def reduce_stock(self, item_name, quantity):
@@ -47,7 +46,6 @@ class Store:
             "UPDATE Items SET Stock = Stock - ? WHERE item_name = ?",
             (quantity, item_name)
         )
-
         self.conn.commit()
 
     def increase_stock(self, item_name, quantity):
@@ -55,14 +53,50 @@ class Store:
             "UPDATE Items SET Stock = Stock + ? WHERE item_name = ?",
             (quantity, item_name)
         )
-
         self.conn.commit()
 
 
-class Cart:
+class User:
     def __init__(self, store):
         self.store = store
-        self.cart_items = []
+
+    def signup(self, username, password):
+        self.store.cursor.execute(
+            "SELECT * FROM Users WHERE username = ?",
+            (username,)
+        )
+
+        result = self.store.cursor.fetchone()
+
+        if result is not None:
+            raise ValueError("Username already exists")
+
+        self.store.cursor.execute(
+            "INSERT INTO Users (username, password) VALUES (?, ?)",
+            (username, password)
+        )
+
+        self.store.conn.commit()
+        return "Signup successful"
+
+    def login(self, username, password):
+        self.store.cursor.execute(
+            "SELECT Id FROM Users WHERE username = ? AND password = ?",
+            (username, password)
+        )
+
+        result = self.store.cursor.fetchone()
+
+        if result is None:
+            raise ValueError("Invalid username or password")
+
+        return result[0]
+
+
+class Cart:
+    def __init__(self, store, user_id):
+        self.store = store
+        self.user_id = user_id
 
 
 class AddItem:
@@ -75,20 +109,21 @@ class AddItem:
         price = cart.store.get_price(item_name)
 
         cart.store.cursor.execute(
-            "SELECT quantity FROM Cart WHERE item_name = ?",
-            (item_name,)
+            "SELECT quantity FROM Cart WHERE item_name = ? AND user_id = ?",
+            (item_name, cart.user_id)
         )
+
         result = cart.store.cursor.fetchone()
 
         if result is None:
             cart.store.cursor.execute(
-                "INSERT INTO Cart (item_name, quantity, Price) VALUES (?, ?, ?)",
-                (item_name, quantity, price)
+                "INSERT INTO Cart (item_name, quantity, Price, user_id) VALUES (?, ?, ?, ?)",
+                (item_name, quantity, price, cart.user_id)
             )
         else:
             cart.store.cursor.execute(
-                "UPDATE Cart SET quantity = quantity + ? WHERE item_name = ?",
-                (quantity, item_name)
+                "UPDATE Cart SET quantity = quantity + ? WHERE item_name = ? AND user_id = ?",
+                (quantity, item_name, cart.user_id)
             )
 
         cart.store.reduce_stock(item_name, quantity)
@@ -99,7 +134,11 @@ class AddItem:
 
 class DisplayCart:
     def display_cart(self, cart):
-        cart.store.cursor.execute("SELECT item_name, quantity FROM Cart")
+        cart.store.cursor.execute(
+            "SELECT item_name, quantity FROM Cart WHERE user_id = ?",
+            (cart.user_id,)
+        )
+
         rows = cart.store.cursor.fetchall()
 
         if len(rows) == 0:
@@ -116,8 +155,10 @@ class DisplayCart:
 class CalculateTotal:
     def calculate_total(self, cart):
         cart.store.cursor.execute(
-            "SELECT quantity, Price FROM Cart"
+            "SELECT quantity, Price FROM Cart WHERE user_id = ?",
+            (cart.user_id,)
         )
+
         rows = cart.store.cursor.fetchall()
 
         total_cost = 0
@@ -131,8 +172,8 @@ class CalculateTotal:
 class RemoveItem:
     def remove_item(self, cart, item_name, quantity):
         cart.store.cursor.execute(
-            "SELECT quantity FROM Cart WHERE item_name = ?",
-            (item_name,)
+            "SELECT quantity FROM Cart WHERE item_name = ? AND user_id = ?",
+            (item_name, cart.user_id)
         )
 
         result = cart.store.cursor.fetchone()
@@ -147,13 +188,13 @@ class RemoveItem:
 
         if quantity == cart_quantity:
             cart.store.cursor.execute(
-                "DELETE FROM Cart WHERE item_name = ?",
-                (item_name,)
+                "DELETE FROM Cart WHERE item_name = ? AND user_id = ?",
+                (item_name, cart.user_id)
             )
         else:
             cart.store.cursor.execute(
-                "UPDATE Cart SET quantity = quantity - ? WHERE item_name = ?",
-                (quantity, item_name)
+                "UPDATE Cart SET quantity = quantity - ? WHERE item_name = ? AND user_id = ?",
+                (quantity, item_name, cart.user_id)
             )
 
         cart.store.increase_stock(item_name, quantity)
