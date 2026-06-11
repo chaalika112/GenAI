@@ -58,7 +58,8 @@ while True:
                     try:
                         remove_item = input("\nEnter item name to remove: ")
 
-                        if remove_item not in cart.cart_items:
+                        store.cursor.execute("SELECT quantity FROM Cart WHERE item_name = ?", (remove_item,))
+                        if store.cursor.fetchone() is None:
                             print("Item not found in cart")
                             continue
 
