@@ -1,5 +1,5 @@
 import sqlite3
-
+from datetime import datetime
 
 class Store:
     def __init__(self):
@@ -71,9 +71,11 @@ class User:
         if result is not None:
             raise ValueError("Username already exists")
 
+        created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
         self.store.cursor.execute(
-            "INSERT INTO Users (username, password) VALUES (?, ?)",
-            (username, password)
+            "INSERT INTO Users (username, password, created_at) VALUES (?, ?, ?)",
+            (username, password, created_at)
         )
 
         self.store.conn.commit()
